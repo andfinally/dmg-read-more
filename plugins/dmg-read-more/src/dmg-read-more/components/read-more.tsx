@@ -2,6 +2,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import {
 	Animate,
 	Button,
+	CheckboxControl,
 	TextControl,
 	PanelBody,
 	PanelRow
@@ -23,13 +24,18 @@ export default function ReadMore( { selectPost, selectedPostId }: ReadMoreProps 
 	const baseSearchArgs: SearchArgs = {
 		_fields: [ 'id', 'title', 'link' ],
 		per_page: 10,
-		search: ''
+		search: '',
 	};
 	const currentPostId = select( 'core/editor' ).getCurrentPostId();
 	if ( currentPostId ) baseSearchArgs.exclude = currentPostId;
 
 	const [ searchTerm, setSearchTerm ] = useState( '' );
 	const [ searchArgs, setSearchArgs ] = useState( baseSearchArgs );
+	const [ searchRecent, setSearchRecent ] = useState( true );
+
+	const twoYearsAgo = new Date();
+	twoYearsAgo.setFullYear( twoYearsAgo.getFullYear() - 2 );
+	const twoYearsAgoFormatted = twoYearsAgo.toISOString();
 
 	let postsResult = useEntityRecords(
 		'postType',
@@ -38,10 +44,16 @@ export default function ReadMore( { selectPost, selectedPostId }: ReadMoreProps 
 	);
 
 	function setSearchOrIdArgs( searchTerm: string | number ) {
+		const newSearchArgs = { ...baseSearchArgs };
+
+		if ( searchRecent ) {
+			newSearchArgs.after = twoYearsAgoFormatted;
+		}
+
 		if ( searchTerm !== '' && Number.isInteger( Number( searchTerm ) ) ) {
-			setSearchArgs( { ...baseSearchArgs, include: Number( searchTerm ) } );
+			setSearchArgs( { ...newSearchArgs, include: Number( searchTerm ) } );
 		} else {
-			setSearchArgs( { ...baseSearchArgs, search: searchTerm as string } );
+			setSearchArgs( { ...newSearchArgs, search: searchTerm as string } );
 		}
 	}
 
@@ -61,10 +73,44 @@ export default function ReadMore( { selectPost, selectedPostId }: ReadMoreProps 
 
 	const handlePaginationClick = useCallback(
 		( pageNumber: number ) => {
-			setSearchArgs( { ...searchArgs, page: pageNumber } );
+			const newSearchArgs = { ...baseSearchArgs };
+
+			if ( searchArgs.search ) {
+				newSearchArgs.search = searchArgs.search;
+			}
+
+			if ( searchArgs.include ) {
+				newSearchArgs.include = searchArgs.include;
+			}
+
+			if ( searchRecent ) {
+				newSearchArgs.after = twoYearsAgoFormatted;
+			}
+
+			newSearchArgs.page = pageNumber;
+
+			setSearchArgs( newSearchArgs );
 		},
-		[ searchArgs ]
+		[ searchArgs, searchRecent, baseSearchArgs, twoYearsAgoFormatted ]
 	);
+
+	const handleCheckboxChange = useCallback( () => {
+		const newSearchRecent = ! searchRecent;
+		setSearchRecent( newSearchRecent );
+
+		const updatedArgs = { ...searchArgs };
+
+		// We always reset to page 1 when the filter is toggled.
+		updatedArgs.page = 1;
+
+		if ( newSearchRecent ) {
+			updatedArgs.after = twoYearsAgoFormatted;
+		} else {
+			delete updatedArgs.after;
+		}
+
+		setSearchArgs( updatedArgs );
+	}, [ searchRecent, searchArgs, twoYearsAgoFormatted ] );
 
 	const renderLoadingList = useCallback( ( { className } ) => (
 		<div className={ className }>
@@ -93,6 +139,14 @@ export default function ReadMore( { selectPost, selectedPostId }: ReadMoreProps 
 						onClick={ handleSearchButtonClick }
 						text="Search"
 						isBusy={ postsResult?.isResolving }
+					/>
+				</PanelRow>
+				<PanelRow className="read-more__checkbox">
+					<CheckboxControl
+						__nextHasNoMarginBottom
+						checked={ searchRecent }
+						label="Search last two years only"
+						onChange={ handleCheckboxChange }
 					/>
 				</PanelRow>
 				{

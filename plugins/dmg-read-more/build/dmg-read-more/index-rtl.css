@@ -12,6 +12,12 @@
 .block-editor-block-inspector .read-more__inputs .components-text-control__input {
   height: 40px;
 }
+.block-editor-block-inspector .read-more__checkbox {
+  margin-top: 0;
+}
+.block-editor-block-inspector .read-more__checkbox .components-checkbox-control__label {
+  max-width: 95%;
+}
 .block-editor-block-inspector .read-more__posts {
   flex-wrap: wrap;
 }

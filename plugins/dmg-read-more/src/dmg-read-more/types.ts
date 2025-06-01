@@ -8,10 +8,11 @@ export type Post = {
 }
 
 export type SearchArgs = {
-	per_page?: number;
-	exclude?: number | number[];
-	search?: string;
-	page?: number;
-	include?: number | number[];
-	_fields?: string | string[];
-}
+  _fields?: string[];
+  per_page?: number;
+  search?: string;
+  include?: number;
+  exclude?: number;
+  page?: number;
+  after?: string;
+};

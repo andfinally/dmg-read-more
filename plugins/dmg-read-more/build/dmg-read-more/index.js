@@ -115,7 +115,7 @@ function ReadMorePosts({
   selectPost,
   selectedPostId = 0
 }) {
-  if (posts.length === 0) {
+  if (!posts || posts.length === 0) {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("p", {
       children: "No posts found."
     });
@@ -183,16 +183,26 @@ function ReadMore({
   if (currentPostId) baseSearchArgs.exclude = currentPostId;
   const [searchTerm, setSearchTerm] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)('');
   const [searchArgs, setSearchArgs] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)(baseSearchArgs);
+  const [searchRecent, setSearchRecent] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)(true);
+  const twoYearsAgo = new Date();
+  twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+  const twoYearsAgoFormatted = twoYearsAgo.toISOString();
   let postsResult = (0,_wordpress_core_data__WEBPACK_IMPORTED_MODULE_3__.useEntityRecords)('postType', 'post', searchArgs);
   function setSearchOrIdArgs(searchTerm) {
+    const newSearchArgs = {
+      ...baseSearchArgs
+    };
+    if (searchRecent) {
+      newSearchArgs.after = twoYearsAgoFormatted;
+    }
     if (searchTerm !== '' && Number.isInteger(Number(searchTerm))) {
       setSearchArgs({
-        ...baseSearchArgs,
+        ...newSearchArgs,
         include: Number(searchTerm)
       });
     } else {
       setSearchArgs({
-        ...baseSearchArgs,
+        ...newSearchArgs,
         search: searchTerm
       });
     }
@@ -208,11 +218,37 @@ function ReadMore({
     setSearchOrIdArgs(searchTerm);
   }, [searchTerm, setSearchOrIdArgs]);
   const handlePaginationClick = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useCallback)(pageNumber => {
-    setSearchArgs({
-      ...searchArgs,
-      page: pageNumber
-    });
-  }, [searchArgs]);
+    const newSearchArgs = {
+      ...baseSearchArgs
+    };
+    if (searchArgs.search) {
+      newSearchArgs.search = searchArgs.search;
+    }
+    if (searchArgs.include) {
+      newSearchArgs.include = searchArgs.include;
+    }
+    if (searchRecent) {
+      newSearchArgs.after = twoYearsAgoFormatted;
+    }
+    newSearchArgs.page = pageNumber;
+    setSearchArgs(newSearchArgs);
+  }, [searchArgs, searchRecent, baseSearchArgs, twoYearsAgoFormatted]);
+  const handleCheckboxChange = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useCallback)(() => {
+    const newSearchRecent = !searchRecent;
+    setSearchRecent(newSearchRecent);
+    const updatedArgs = {
+      ...searchArgs
+    };
+
+    // We always reset to page 1 when the filter is toggled.
+    updatedArgs.page = 1;
+    if (newSearchRecent) {
+      updatedArgs.after = twoYearsAgoFormatted;
+    } else {
+      delete updatedArgs.after;
+    }
+    setSearchArgs(updatedArgs);
+  }, [searchRecent, searchArgs, twoYearsAgoFormatted]);
   const renderLoadingList = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useCallback)(({
     className
   }) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
@@ -241,6 +277,14 @@ function ReadMore({
           text: "Search",
           isBusy: postsResult?.isResolving
         })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+        className: "read-more__checkbox",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.CheckboxControl, {
+          __nextHasNoMarginBottom: true,
+          checked: searchRecent,
+          label: "Search last two years only",
+          onChange: handleCheckboxChange
+        })
       }), postsResult?.isResolving ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
         className: "read-more__posts read-more__posts--loading",
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Animate, {

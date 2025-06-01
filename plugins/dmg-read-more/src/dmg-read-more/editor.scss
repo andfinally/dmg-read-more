@@ -13,6 +13,14 @@
 		}
 	}
 
+	.read-more__checkbox {
+		margin-top: 0;
+
+		.components-checkbox-control__label {
+			max-width: 95%;
+		}
+	}
+
 	.read-more__posts {
 		flex-wrap: wrap;
 	}

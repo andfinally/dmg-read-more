@@ -19,7 +19,7 @@ export function ReadMorePosts( {
 	selectPost,
 	selectedPostId = 0,
 }: ReadMorePostsProps ) {
-	if ( posts.length === 0 ) {
+	if ( ! posts || posts.length === 0 ) {
 		return (
 			<p>No posts found.</p>
 		);

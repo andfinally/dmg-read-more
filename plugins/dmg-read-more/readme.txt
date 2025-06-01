@@ -21,9 +21,10 @@ The plugin supports WordPress 6.6 and above.
 1. Upload the [plugin zip file](./dmg-read-more.zip) to your WordPress site.
 2. Activate the plugin on the plugins page in WordPress admin.
 3. Create or edit a post and search for `dmg/read-more` in the block picker.
-4. Insert the block in the post. Now use the input in the block settings to search for another post. You can search by post ID as well as search string.
-5. When you select a post in the search results, it will be set to be displayed in the parent post with a "Read More" label.
-6. A WP-CLI command allows you to find posts which contain this block. You can pass `date-after` and `date-before` parameters. Without these, it will search posts published in the last 30 days. Example command: `wp-env run cli wp dmg-read-more search --date-after=2020-01-01`.
+4. Insert the block in the post. By default, you'll see a list of the latest published posts in the block settings.
+5. Use the input in the block settings to search for another post. You can search by post ID as well as search string. If you uncheck the "Search last two years only" checkbox, you can search for older posts. Use the pagination buttons to page through the results.
+6. When you click on a post in the search results, it will be set to be displayed in the parent post with a "Read More" label.
+7. A WP-CLI command allows you to find posts which contain this block. You can pass `date-after` and `date-before` parameters. Without these, it will search posts published in the last 30 days. Example command: `wp-env run cli wp dmg-read-more search --date-after=2020-01-01`.
 
 == Changelog ==
 
