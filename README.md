@@ -12,7 +12,7 @@ The plugin supports WordPress 6.6 and PHP 7.4 and above.
 
 ## Usage
 
-1. Upload the [plugin zip file](./dmg-read-more.zip) to your WordPress site.
+1. Upload the [plugin zip file](https://github.com/andfinally/dmg-read-more/raw/refs/heads/main/dmg-read-more.zip) to your WordPress site.
 2. Activate the plugin on the plugins page in WordPress admin.
 3. Create or edit a post and search for `dmg/read-more` in the block picker.
 4. Insert the block in the post. Now use the input in the block settings to search for another post. You can search by post ID as well as search string.
