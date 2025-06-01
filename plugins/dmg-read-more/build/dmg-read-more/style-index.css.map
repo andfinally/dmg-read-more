@@ -1,0 +1,1 @@
+{"version":3,"file":"dmg-read-more/style-index.css","mappings":";;;AAAA;EACC;AACD;AACC;EACC;EACA;AACF,C","sources":["webpack://dmg-read-more/./src/dmg-read-more/style.scss"],"sourcesContent":[".dmg-read-more {\n\tcolor: #363b3f;\n\n\tspan {\n\t\tcolor: #2271b1;\n\t\tfont-weight: bold;\n\t}\n}\n"],"names":[],"sourceRoot":""}

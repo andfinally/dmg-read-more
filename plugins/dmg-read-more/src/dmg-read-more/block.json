@@ -1,0 +1,29 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "dmg/read-more",
+	"version": "1.0.0",
+	"title": "DMG Read More",
+	"category": "widgets",
+	"description": "Search for a published post and add a link to it in the post content.",
+	"example": {},
+	"supports": {
+		"html": false
+	},
+	"attributes": {
+		"postId": {
+			"type": "number"
+		},
+		"postTitle": {
+			"type": "string"
+		},
+		"postUrl": {
+			"type": "string"
+		}
+	},
+	"textdomain": "dmg-read-more",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"render": "file:./render.php"
+}
