@@ -186,7 +186,8 @@ function ReadMore({
   const [searchRecent, setSearchRecent] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)(true);
   const twoYearsAgo = new Date();
   twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-  const twoYearsAgoFormatted = twoYearsAgo.toISOString();
+  const twoYearsAgoISOPrefix = twoYearsAgo.toISOString().split('T')[0];
+  const twoYearsAgoFormatted = twoYearsAgoISOPrefix + 'T00:00:00Z';
   let postsResult = (0,_wordpress_core_data__WEBPACK_IMPORTED_MODULE_3__.useEntityRecords)('postType', 'post', searchArgs);
   function setSearchOrIdArgs(searchTerm) {
     const newSearchArgs = {
@@ -218,21 +219,11 @@ function ReadMore({
     setSearchOrIdArgs(searchTerm);
   }, [searchTerm, setSearchOrIdArgs]);
   const handlePaginationClick = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useCallback)(pageNumber => {
-    const newSearchArgs = {
-      ...baseSearchArgs
-    };
-    if (searchArgs.search) {
-      newSearchArgs.search = searchArgs.search;
-    }
-    if (searchArgs.include) {
-      newSearchArgs.include = searchArgs.include;
-    }
-    if (searchRecent) {
-      newSearchArgs.after = twoYearsAgoFormatted;
-    }
-    newSearchArgs.page = pageNumber;
-    setSearchArgs(newSearchArgs);
-  }, [searchArgs, searchRecent, baseSearchArgs, twoYearsAgoFormatted]);
+    setSearchArgs({
+      ...searchArgs,
+      page: pageNumber
+    });
+  }, [searchArgs]);
   const handleCheckboxChange = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useCallback)(() => {
     const newSearchRecent = !searchRecent;
     setSearchRecent(newSearchRecent);

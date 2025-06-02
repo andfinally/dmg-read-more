@@ -35,7 +35,8 @@ export default function ReadMore( { selectPost, selectedPostId }: ReadMoreProps 
 
 	const twoYearsAgo = new Date();
 	twoYearsAgo.setFullYear( twoYearsAgo.getFullYear() - 2 );
-	const twoYearsAgoFormatted = twoYearsAgo.toISOString();
+	const twoYearsAgoISOPrefix = twoYearsAgo.toISOString().split( 'T' )[ 0 ];
+	const twoYearsAgoFormatted = twoYearsAgoISOPrefix + 'T00:00:00Z';
 
 	let postsResult = useEntityRecords(
 		'postType',
@@ -73,25 +74,9 @@ export default function ReadMore( { selectPost, selectedPostId }: ReadMoreProps 
 
 	const handlePaginationClick = useCallback(
 		( pageNumber: number ) => {
-			const newSearchArgs = { ...baseSearchArgs };
-
-			if ( searchArgs.search ) {
-				newSearchArgs.search = searchArgs.search;
-			}
-
-			if ( searchArgs.include ) {
-				newSearchArgs.include = searchArgs.include;
-			}
-
-			if ( searchRecent ) {
-				newSearchArgs.after = twoYearsAgoFormatted;
-			}
-
-			newSearchArgs.page = pageNumber;
-
-			setSearchArgs( newSearchArgs );
+			setSearchArgs( { ...searchArgs, page: pageNumber } );
 		},
-		[ searchArgs, searchRecent, baseSearchArgs, twoYearsAgoFormatted ]
+		[ searchArgs ]
 	);
 
 	const handleCheckboxChange = useCallback( () => {
