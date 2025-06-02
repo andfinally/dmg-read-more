@@ -21,22 +21,24 @@ type ReadMoreProps = {
 
 export default function ReadMore( { selectPost, selectedPostId }: ReadMoreProps ) {
 
+	const twoYearsAgo = new Date();
+	twoYearsAgo.setFullYear( twoYearsAgo.getFullYear() - 2 );
+	const twoYearsAgoISOPrefix = twoYearsAgo.toISOString().split( 'T' )[ 0 ];
+	const twoYearsAgoFormatted = twoYearsAgoISOPrefix + 'T00:00:00Z';
+
 	const baseSearchArgs: SearchArgs = {
 		_fields: [ 'id', 'title', 'link' ],
 		per_page: 10,
 		search: '',
+		after: twoYearsAgoFormatted
 	};
+
 	const currentPostId = select( 'core/editor' ).getCurrentPostId();
 	if ( currentPostId ) baseSearchArgs.exclude = currentPostId;
 
 	const [ searchTerm, setSearchTerm ] = useState( '' );
 	const [ searchArgs, setSearchArgs ] = useState( baseSearchArgs );
 	const [ searchRecent, setSearchRecent ] = useState( true );
-
-	const twoYearsAgo = new Date();
-	twoYearsAgo.setFullYear( twoYearsAgo.getFullYear() - 2 );
-	const twoYearsAgoISOPrefix = twoYearsAgo.toISOString().split( 'T' )[ 0 ];
-	const twoYearsAgoFormatted = twoYearsAgoISOPrefix + 'T00:00:00Z';
 
 	let postsResult = useEntityRecords(
 		'postType',
@@ -47,8 +49,8 @@ export default function ReadMore( { selectPost, selectedPostId }: ReadMoreProps 
 	function setSearchOrIdArgs( searchTerm: string | number ) {
 		const newSearchArgs = { ...baseSearchArgs };
 
-		if ( searchRecent ) {
-			newSearchArgs.after = twoYearsAgoFormatted;
+		if ( ! searchRecent ) {
+			delete newSearchArgs.after;
 		}
 
 		if ( searchTerm !== '' && Number.isInteger( Number( searchTerm ) ) ) {

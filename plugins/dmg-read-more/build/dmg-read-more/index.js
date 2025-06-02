@@ -174,27 +174,28 @@ function ReadMore({
   selectPost,
   selectedPostId
 }) {
+  const twoYearsAgo = new Date();
+  twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+  const twoYearsAgoISOPrefix = twoYearsAgo.toISOString().split('T')[0];
+  const twoYearsAgoFormatted = twoYearsAgoISOPrefix + 'T00:00:00Z';
   const baseSearchArgs = {
     _fields: ['id', 'title', 'link'],
     per_page: 10,
-    search: ''
+    search: '',
+    after: twoYearsAgoFormatted
   };
   const currentPostId = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.select)('core/editor').getCurrentPostId();
   if (currentPostId) baseSearchArgs.exclude = currentPostId;
   const [searchTerm, setSearchTerm] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)('');
   const [searchArgs, setSearchArgs] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)(baseSearchArgs);
   const [searchRecent, setSearchRecent] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)(true);
-  const twoYearsAgo = new Date();
-  twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
-  const twoYearsAgoISOPrefix = twoYearsAgo.toISOString().split('T')[0];
-  const twoYearsAgoFormatted = twoYearsAgoISOPrefix + 'T00:00:00Z';
   let postsResult = (0,_wordpress_core_data__WEBPACK_IMPORTED_MODULE_3__.useEntityRecords)('postType', 'post', searchArgs);
   function setSearchOrIdArgs(searchTerm) {
     const newSearchArgs = {
       ...baseSearchArgs
     };
-    if (searchRecent) {
-      newSearchArgs.after = twoYearsAgoFormatted;
+    if (!searchRecent) {
+      delete newSearchArgs.after;
     }
     if (searchTerm !== '' && Number.isInteger(Number(searchTerm))) {
       setSearchArgs({
