@@ -25,8 +25,6 @@ defined( 'ABSPATH' ) || exit;
  */
 function dmg_read_more_block_init() {
 
-	require_once 'includes/class-dmg-read-more-cli.php';
-
 	/**
 	 * Registers the block(s) metadata from the `blocks-manifest.php` and registers the block type(s)
 	 * based on the registered block metadata.
@@ -49,6 +47,7 @@ function dmg_read_more_block_init() {
 	if ( function_exists( 'wp_register_block_metadata_collection' ) ) {
 		wp_register_block_metadata_collection( __DIR__ . '/build', __DIR__ . '/build/blocks-manifest.php' );
 	}
+
 	/**
 	 * Registers the block type(s) in the `blocks-manifest.php` file.
 	 *
@@ -62,3 +61,13 @@ function dmg_read_more_block_init() {
 
 add_action( 'init', 'dmg_read_more_block_init' );
 
+/**
+ * Includes the WP-CLI command when we're in the CLI context.
+ *
+ * @return void
+ */
+function dmg_include_wpcli_command() {
+	require_once 'includes/class-dmg-read-more-cli.php';
+}
+
+add_action( 'cli_init', 'dmg_include_wpcli_command' );

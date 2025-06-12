@@ -1,15 +1,15 @@
-import { useCallback } from '@wordpress/element';
+import { Button } from '@wordpress/components';
 import Pagination from './pagination';
 import type { Post } from '../types';
 
 type ReadMorePostsProps = {
-	posts?: Array<Post>;
+	posts?: Array< Post >;
 	totalPages: number;
 	handlePaginationClick: ( pageNumber: number ) => void;
 	currentPage: number;
 	selectPost: ( post: Post ) => void;
 	selectedPostId: number;
-}
+};
 
 export function ReadMorePosts( {
 	posts = [],
@@ -20,32 +20,45 @@ export function ReadMorePosts( {
 	selectedPostId = 0,
 }: ReadMorePostsProps ) {
 	if ( ! posts || posts.length === 0 ) {
-		return (
-			<p>No posts found.</p>
-		);
+		return <p>No posts found.</p>;
 	}
 
-	const createPostClickHandler = useCallback(
-		( post: Post ) => () => selectPost( post ),
-		[ selectPost ]
-	);
+	/**
+	 * Select a post as the one we show in the block.
+	 *
+	 * @param post
+	 */
+	const createPostClickHandler = ( post: Post ) => () => selectPost( post );
 
 	return (
 		<>
 			<ul>
-				{
-					posts.map( ( post: Post ) => {
-						return (
-							<li
-								key={ post.id }
+				{ posts.map( ( post: Post ) => {
+					return (
+						<li
+							key={ post.id }
+							className={ `read-more__post ${
+								post.id === selectedPostId
+									? 'read-more__post--selected'
+									: ''
+							}` }
+						>
+							<Button
 								onClick={ createPostClickHandler( post ) }
-								className={ `read-more__post ${ post.id === selectedPostId ? 'read-more__post--selected' : '' }` }
+								onKeyDown={ ( e ) => {
+									if ( e.key === 'Enter' || e.key === ' ' ) {
+										createPostClickHandler( post )();
+									}
+								} }
+								size="compact"
 							>
-								{ post.title.rendered }
-							</li>
-						);
-					} )
-				}
+								<span className="read-more__post-title">
+									{ post.title.rendered }
+								</span>
+							</Button>
+						</li>
+					);
+				} ) }
 			</ul>
 			<Pagination
 				totalPages={ totalPages }
