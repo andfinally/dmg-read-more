@@ -12,6 +12,36 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/tru
 
 /***/ }),
 
+/***/ "./src/dmg-read-more/components/loading-list.tsx":
+/*!*******************************************************!*\
+  !*** ./src/dmg-read-more/components/loading-list.tsx ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ LoadingList)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__);
+
+function LoadingList({
+  className
+}) {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+    className: className,
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", {
+      children: [...Array(10)].map((_, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", {
+        className: "read-more__post"
+      }, i))
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", {
+      className: "read-more__pagination"
+    })]
+  });
+}
+
+/***/ }),
+
 /***/ "./src/dmg-read-more/components/pagination.tsx":
 /*!*****************************************************!*\
   !*** ./src/dmg-read-more/components/pagination.tsx ***!
@@ -24,41 +54,51 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__);
 
 
-
+/**
+ * Return array of page numbers we're going to show.
+ *
+ * We show the first and last, and one on either side of the
+ * current page.
+ *
+ * If there's only one page missing between a visible page and its neighbour,
+ * we show that too.
+ *
+ * The rest we replace with an ellipsis.
+ *
+ * @param currentPage
+ * @param total
+ */
 function getPagination(currentPage, total) {
-  const delta = 1; // Number of pages to show around the current page.
-  const range = [];
-  const rangeWithDots = [];
-  let lastPageInRange;
-
-  // Always show first and last page, and pages around the current page.
+  const delta = 1; // Number of pages to show around the current page
+  const result = [];
+  let lastAddedPage = 0;
   for (let i = 1; i <= total; i++) {
-    if (i === 1 || i === total || i >= currentPage - delta && i <= currentPage + delta) {
-      range.push(i);
-    }
-  }
-
-  // Insert ellipsis where page numbers are skipped.
-  for (let i of range) {
-    if (lastPageInRange) {
-      if (i - lastPageInRange === 2) {
-        // Only one page missing at end of range, so add one.
-        rangeWithDots.push(lastPageInRange + 1);
-      } else if (i - lastPageInRange > 2) {
-        // More than one missing, so add an ellipsis.
-        rangeWithDots.push('...');
+    // Determine if current page should be visible
+    const isFirstOrLast = i === 1 || i === total;
+    const isNearCurrent = i >= currentPage - delta && i <= currentPage + delta;
+    if (isFirstOrLast || isNearCurrent) {
+      // Handle gaps before adding the current page
+      if (lastAddedPage > 0) {
+        // Gap of exactly 2 means one page is missing
+        if (i - lastAddedPage === 2) {
+          result.push(i - 1);
+        }
+        // Gap larger than 2 means we need an ellipsis
+        else if (i - lastAddedPage > 2) {
+          result.push('...');
+        }
       }
+
+      // Add the current page to results
+      result.push(i);
+      lastAddedPage = i;
     }
-    rangeWithDots.push(i);
-    lastPageInRange = i;
   }
-  return rangeWithDots;
+  return result;
 }
 function Pagination({
   totalPages = 0,
@@ -69,14 +109,21 @@ function Pagination({
     return null;
   }
   const pages = getPagination(currentPage, totalPages);
-  const createHandlePaginationClick = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.useCallback)(page => () => handlePaginationClick(page), [handlePaginationClick]);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("ul", {
+
+  /**
+   * Create closure over page number, so we can attach a handler to each
+   * page button.
+   *
+   * @param page
+   */
+  const createHandlePaginationClick = page => () => handlePaginationClick(page);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("ul", {
     className: "read-more__pagination",
     children: pages.map((page, index) => {
-      return page === '...' ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("li", {
+      return page === '...' ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("li", {
         children: "\u2026"
-      }, 'dots-' + index) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("li", {
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__.Button, {
+      }, 'dots-' + index) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("li", {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__.Button, {
           size: "small",
           variant: page === currentPage ? 'primary' : 'secondary',
           onClick: createHandlePaginationClick(page),
@@ -99,8 +146,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ReadMorePosts: () => (/* binding */ ReadMorePosts)
 /* harmony export */ });
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _pagination__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./pagination */ "./src/dmg-read-more/components/pagination.tsx");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__);
@@ -120,14 +167,31 @@ function ReadMorePosts({
       children: "No posts found."
     });
   }
-  const createPostClickHandler = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useCallback)(post => () => selectPost(post), [selectPost]);
+
+  /**
+   * Select a post as the one we show in the block.
+   *
+   * @param post
+   */
+  const createPostClickHandler = post => () => selectPost(post);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("ul", {
       children: posts.map(post => {
         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("li", {
-          onClick: createPostClickHandler(post),
           className: `read-more__post ${post.id === selectedPostId ? 'read-more__post--selected' : ''}`,
-          children: post.title.rendered
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_0__.Button, {
+            onClick: createPostClickHandler(post),
+            onKeyDown: e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                createPostClickHandler(post)();
+              }
+            },
+            size: "compact",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+              className: "read-more__post-title",
+              children: post.title.rendered
+            })
+          })
         }, post.id);
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_pagination__WEBPACK_IMPORTED_MODULE_1__["default"], {
@@ -161,8 +225,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _read_more_posts__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./read-more-posts */ "./src/dmg-read-more/components/read-more-posts.tsx");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _loading_list__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./loading-list */ "./src/dmg-read-more/components/loading-list.tsx");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__);
+
 
 
 
@@ -174,58 +240,99 @@ function ReadMore({
   selectPost,
   selectedPostId
 }) {
+  // Initialise date range we'll use to restrict the default search.
   const twoYearsAgo = new Date();
   twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
   const twoYearsAgoISOPrefix = twoYearsAgo.toISOString().split('T')[0];
   const twoYearsAgoFormatted = twoYearsAgoISOPrefix + 'T00:00:00Z';
+
+  // Base search args.
   const baseSearchArgs = {
     _fields: ['id', 'title', 'link'],
     per_page: 10,
     search: '',
     after: twoYearsAgoFormatted
   };
+
+  // Get ID of current post so we can exclude it.
   const currentPostId = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_2__.select)('core/editor').getCurrentPostId();
-  if (currentPostId) baseSearchArgs.exclude = currentPostId;
+  if (currentPostId) {
+    baseSearchArgs.exclude = currentPostId;
+  }
   const [searchTerm, setSearchTerm] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)('');
   const [searchArgs, setSearchArgs] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)(baseSearchArgs);
   const [searchRecent, setSearchRecent] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useState)(true);
-  let postsResult = (0,_wordpress_core_data__WEBPACK_IMPORTED_MODULE_3__.useEntityRecords)('postType', 'post', searchArgs);
-  function setSearchOrIdArgs(searchTerm) {
+
+  // We don't need to memoize searchArgs: useEntityRecords changes it into a string
+  // internally, to avoid unnecessary repetition of requests because of changed
+  // object references.
+  const postsResult = (0,_wordpress_core_data__WEBPACK_IMPORTED_MODULE_3__.useEntityRecords)('postType', 'post', searchArgs);
+
+  /**
+   * Check if the search term is a number. If so, set the `include` search arg
+   * to find a post by ID. Otherwise, set the `search` arg to search by string.
+   *
+   * @param searchStringOrNumber
+   */
+  function setSearchOrIdArgs(searchStringOrNumber) {
     const newSearchArgs = {
       ...baseSearchArgs
     };
     if (!searchRecent) {
       delete newSearchArgs.after;
     }
-    if (searchTerm !== '' && Number.isInteger(Number(searchTerm))) {
+    if (searchStringOrNumber !== '' && Number.isInteger(Number(searchStringOrNumber))) {
       setSearchArgs({
         ...newSearchArgs,
-        include: Number(searchTerm)
+        include: Number(searchStringOrNumber)
       });
     } else {
       setSearchArgs({
         ...newSearchArgs,
-        search: searchTerm
+        search: searchStringOrNumber
       });
     }
   }
-  const handleKeyDown = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useCallback)(e => {
+
+  /**
+   * Handle keydown event so user can clear input or initiate search
+   * using keyboard.
+   *
+   * @param e
+   */
+  const handleKeyDown = e => {
     if (e.key === 'Enter') {
       setSearchOrIdArgs(searchTerm);
     } else if (e.key === 'Escape') {
       setSearchTerm('');
     }
-  }, [searchTerm, setSearchOrIdArgs]);
-  const handleSearchButtonClick = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useCallback)(() => {
+  };
+
+  /**
+   * Handle click on the search button.
+   */
+  const handleSearchButtonClick = () => {
     setSearchOrIdArgs(searchTerm);
-  }, [searchTerm, setSearchOrIdArgs]);
-  const handlePaginationClick = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useCallback)(pageNumber => {
+  };
+
+  /**
+   * Handle click on a pagination button. Change search args to request
+   * the specified page.
+   *
+   * @param pageNumber
+   */
+  const handlePaginationClick = pageNumber => {
     setSearchArgs({
       ...searchArgs,
       page: pageNumber
     });
-  }, [searchArgs]);
-  const handleCheckboxChange = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useCallback)(() => {
+  };
+
+  /**
+   * Handle click on checkbox that restricts search to the last two years,
+   * or removes that limit.
+   */
+  const handleCheckboxChange = () => {
     const newSearchRecent = !searchRecent;
     setSearchRecent(newSearchRecent);
     const updatedArgs = {
@@ -240,65 +347,65 @@ function ReadMore({
       delete updatedArgs.after;
     }
     setSearchArgs(updatedArgs);
-  }, [searchRecent, searchArgs, twoYearsAgoFormatted]);
-  const renderLoadingList = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_4__.useCallback)(({
-    className
-  }) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-    className: className,
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("ul", {
-      children: [...Array(10)].map((_, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("li", {
-        className: "read-more__post"
-      }, i))
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("ul", {
-      className: "read-more__pagination"
-    })]
-  }), []);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.InspectorControls, {
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+  };
+  let postsList;
+  if (postsResult?.isResolving) {
+    postsList = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+      className: "read-more__posts read-more__posts--loading",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Animate, {
+        type: "loading",
+        children: ({
+          className
+        }) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_loading_list__WEBPACK_IMPORTED_MODULE_6__["default"], {
+          className: className
+        })
+      })
+    });
+  } else if (postsResult?.hasResolved) {
+    postsList = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+      className: "read-more__posts",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_read_more_posts__WEBPACK_IMPORTED_MODULE_5__.ReadMorePosts, {
+        posts: postsResult?.records,
+        totalPages: postsResult.totalPages,
+        handlePaginationClick: handlePaginationClick,
+        currentPage: searchArgs?.page || 1,
+        selectPost: selectPost,
+        selectedPostId: selectedPostId
+      })
+    });
+  } else {
+    postsList = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+      className: "read-more__posts",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("p", {
+        children: "Error finding posts."
+      })
+    });
+  }
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.InspectorControls, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelBody, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
         className: "read-more__inputs",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.TextControl, {
           onChange: value => setSearchTerm(value),
           value: searchTerm,
           className: "read-more__search-input",
           help: "Enter term or post ID and click Search button to find posts.",
           onKeyDown: handleKeyDown
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
           variant: "secondary",
           onClick: handleSearchButtonClick,
           text: "Search",
           isBusy: postsResult?.isResolving
         })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
         className: "read-more__checkbox",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.CheckboxControl, {
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.CheckboxControl, {
           __nextHasNoMarginBottom: true,
           checked: searchRecent,
           label: "Search last two years only",
           onChange: handleCheckboxChange
         })
-      }), postsResult?.isResolving ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
-        className: "read-more__posts read-more__posts--loading",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Animate, {
-          type: "loading",
-          children: renderLoadingList
-        })
-      }) : postsResult?.hasResolved ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
-        className: "read-more__posts",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_read_more_posts__WEBPACK_IMPORTED_MODULE_5__.ReadMorePosts, {
-          posts: postsResult?.records,
-          totalPages: postsResult.totalPages,
-          handlePaginationClick: handlePaginationClick,
-          currentPage: searchArgs?.page || 1,
-          selectPost: selectPost,
-          selectedPostId: selectedPostId
-        })
-      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.PanelRow, {
-        className: "read-more__posts",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("p", {
-          children: "Error finding posts."
-        })
-      })]
+      }), postsList]
     })
   });
 }
@@ -317,13 +424,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
-/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _components_read_more__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/read-more */ "./src/dmg-read-more/components/read-more.tsx");
-/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./editor.scss */ "./src/dmg-read-more/editor.scss");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__);
-
+/* harmony import */ var _components_read_more__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/read-more */ "./src/dmg-read-more/components/read-more.tsx");
+/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./editor.scss */ "./src/dmg-read-more/editor.scss");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "react/jsx-runtime");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__);
 
 
 
@@ -334,15 +438,15 @@ function SelectedPost({
   url
 }) {
   if (!id) {
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("p", {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("p", {
       children: "DMG Read More \u2013 find a post using the form in the sidebar."
     });
   }
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("p", {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("p", {
     className: "dmg-read-more",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
       children: "Read More:"
-    }), " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("a", {
+    }), " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("a", {
       href: url,
       children: title !== null && title !== void 0 ? title : 'Untitled'
     })]
@@ -353,19 +457,19 @@ function Edit({
   setAttributes
 }) {
   const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_0__.useBlockProps)();
-  const selectPost = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.useCallback)(post => {
+  const selectPost = post => {
     setAttributes({
       postId: post.id,
       postTitle: post.title.rendered,
       postUrl: post.link
     });
-  }, [setAttributes]);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("div", {
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
     ...blockProps,
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_components_read_more__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_components_read_more__WEBPACK_IMPORTED_MODULE_1__["default"], {
       selectPost: selectPost,
       selectedPostId: attributes?.postId
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(SelectedPost, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(SelectedPost, {
       id: attributes?.postId,
       title: attributes?.postTitle,
       url: attributes?.postUrl

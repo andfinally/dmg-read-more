@@ -3,6 +3,8 @@
 /**
  * We make this a dynamic block to make sure we always show the latest title and URL of the selected post,
  * even if they change after it's selected in the block.
+ *
+ * Page content is typically cached in page cache, so this should not add much overhead.
  */
 
 if ( ! empty( $attributes['postId'] ) ) {

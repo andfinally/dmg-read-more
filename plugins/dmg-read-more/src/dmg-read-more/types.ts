@@ -5,14 +5,14 @@ export type Post = {
 		raw: string;
 		rendered: string;
 	};
-}
+};
 
 export type SearchArgs = {
-  _fields?: string[];
-  per_page?: number;
-  search?: string;
-  include?: number;
-  exclude?: number;
-  page?: number;
-  after?: string;
+	_fields?: string[];
+	per_page?: number;
+	search?: string;
+	include?: number;
+	exclude?: number;
+	page?: number;
+	after?: string;
 };
